@@ -1,0 +1,25 @@
+
+\begin{figure*}[ht]
+\krule[variable declaration]{
+\kmiddle{agent}{
+\kprefix{k}{
+ \reduce{{\variable[type]T \variable[ID]X;}}{{}{\dotCt{}}} }
+ \ksuffix{memory}{ \reduce{{\dotCt{}}}{{}{X \mapsto L}}}
+}
+\ksuffix{MMap}{
+ \reduce{\dotCt{}}{{}{L\mapsto undefined(T)}
+}}
+}
+{}{}{}{}
+\krule[variable declaration with assignment]{
+\kmiddle{agent}{
+\kprefix{k}{
+ \reduce{{\variable[type]T \variable[ID]X = V;}}{{}{\dotCt{}}} }
+ \ksuffix{memory}{ \reduce{{\dotCt{}}}{{}{X \mapsto L}}}
+}
+\ksuffix{MMap}{
+ \reduce{\dotCt{}}{{}{L\mapsto V}
+}}
+}
+{}{}{}{}
+\end{figure*}

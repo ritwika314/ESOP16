@@ -1,0 +1,25 @@
+\begin{center}
+\begin{figure}
+\label{fig:lock1}
+\krule[lock request transition]{
+\kprefix{agent}{
+\begin{array}{@{}c@{}}
+\kprefix{k}{\terminal{atomic :}\variable[Statement]Ss
+ \reduce{\dotCt{}}{{\terminal{atomicEnd}}}
+}
+\kall{id}{\variable[Int]{i}}
+\kall{lockState}{
+ \reduce{\constant[\#Type]{idle}}{\constant[\#Type]{request}}
+}
+
+\end{array}
+}
+\ksuffix{lockQueue}{
+{
+ \reduce{\dotCt{}}{{\variable[Int]{i}}}
+}}
+}{}{}{}{}
+
+
+\end{figure}
+\end{center}

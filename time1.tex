@@ -1,0 +1,24 @@
+
+\begin{figure*}[ht]
+\krule[counter advance transition]{
+\kall{agent}{
+\begin{array}{@{}c@{}}
+\kall{k}{
+ \reduce{\terminal{endEventBlock}}{{\dotCt{}}}
+}
+\kall{id}{\variable[Int]i}
+\kall{counter}{ \reduce{\variable[Int]{N}}{{{{\variable[Int]{N}}
+  \mathrel{+_{\scriptstyle\it Int}}
+  {{}\variable[Int]1}}}}}
+\end{array}
+}
+\begin{array}{@{}c@{}}
+\kmiddle{counterMap}{ \reduce{\variable[Int]{i}\mapsto N}{{{{{\variable[Int]{i}\mapsto \variable[Int]{N}+_{Int} 1}}}}}}
+  \end{array}
+}
+{
+  {{\variable[Int]{N}}
+  \mathrel{<_{\scriptstyle\it Int}}
+  {{}\variable[Int]n_0}}
+}{}{}{}
+\end{figure*}

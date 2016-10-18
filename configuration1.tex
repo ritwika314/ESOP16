@@ -1,0 +1,33 @@
+\begin{figure*}[ht]
+\large
+\centerfloat
+  %
+  \renewcommand{\dotCt}[1]{\scriptstyle\textit{#1}}
+  \newcommand{\rid}{\scriptstyle\textit{ID}_{\sf robot}}
+  \newcommand{\env}{\scriptstyle\textit{Var} \;\mapsto\; \textit{Address}}
+  \newcommand{\store}{\scriptstyle\textit{Address} \;\mapsto\; \textit{Value}}
+  %
+$
+\kall{system}{
+  \begin{array}{@{}c@{}}
+  \kall{agents}{
+  	agent*
+  } \mathrel{}
+  \\ \mathrel{}
+  \kall{gMemory}{\dotCt{.Map}}\mathrel{}
+  \kall{MMap}{\dotCt{.Map}} \mathrel{}
+  \kall{time}{\dotCt{Int}} \mathrel{}
+   \kall{counterMap}{\dotCt{.Map}} \mathrel{}
+  \kall{lockQueue}{\dotCt{.List}} \mathrel{}
+  \kall{transitionState}{\terminal{discrete}}\mathrel{}
+  \\ \mathrel{}
+  \end{array}
+}
+$
+  %
+\caption{High Level Semantics Configuration}
+\label{fig:highlevelconfig}
+\end{figure*}
+
+\normalsize
+

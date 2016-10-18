@@ -1,0 +1,20 @@
+\begin{figure}
+\label{fig:lock}
+\krule[lock release transition]{
+\kprefix{agent}{
+\begin{array}{@{}c@{}}
+\kprefix{k}{
+ \reduce{\terminal{atomicEnd }}{\dotCt{}}
+}
+\kall{id}{\variable[Int]{i}}
+\kall{lockState}{
+ \reduce{\constant[\#Type]{lock}}{\constant[\#Type]{idle}}
+}
+
+\end{array}
+}
+\kprefix{lockQueue}{\reduce{\variable[Int]i}{\dotCt{}}}
+\mathrel{}
+}
+{}{}{}{}
+\end{figure}

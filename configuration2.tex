@@ -1,0 +1,29 @@
+
+\begin{figure*}[ht]
+\large
+\centerfloat
+  %
+  \renewcommand{\dotCt}[1]{\scriptstyle\textit{#1}}
+  \newcommand{\rid}{\scriptstyle\textit{ID}_{\sf robot}}
+  \newcommand{\env}{\scriptstyle\textit{Var} \;\mapsto\; \textit{Address}}
+  \newcommand{\store}{\scriptstyle\textit{Address} \;\mapsto\; \textit{Value}}
+  %
+$
+\kall{system}{
+  \begin{array}{@{}c@{}}
+     \kall{k}{\dotCt{K}} \mathrel{}
+      \kall{id}{\dotCt{Int}}\mathrel{}
+      \kall{memory}{\dotCt{.Map}} \mathrel{}
+      \kall{position}{\dotCt{ItemPosition}} \mathrel{}
+      \kall{counter}{\dotCt{Int}} \mathrel{}
+      \kall{lockState}{\terminal{idle}}
+  \\ \mathrel{}
+  \end{array}
+}
+$
+  %
+\caption{Agent Configuration}
+\label{fig:agentconfig}
+\end{figure*}
+
+\normalsize

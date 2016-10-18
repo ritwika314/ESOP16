@@ -1,0 +1,21 @@
+\begin{figure}
+\label{fig:lock}
+\krule[atomic wait transition]{
+\kmiddle{agent}{
+\begin{array}{@{}c@{}}
+\kall{id}{\variable[Int]{i_1}}
+\kall{lockState}{
+ {\constant[\#Type]{request}}
+}
+\kall{counter}{
+\reduce{\variable[Int]N}{\variable[int]N{+_{\scriptstyle\it Int}} \constant[Int]1}
+}
+\end{array}
+}
+\kprefix{lockQueue}{\variable[Int]i_2}
+\begin{array}{@{}c@{}}
+\kmiddle{counterMap}{ \reduce{\variable[Int]{i}\mapsto N}{{{{{\variable[Int]{i}\mapsto \variable[Int]{N}+_{Int} 1}}}}}}
+  \end{array}
+}
+{\variable[Int]i_1 !=_{\scriptstyle\it Int} i_2 \terminal{and} \variable[Int]N <_{\scriptstyle\it Int} \variable[Int]n_0 }{}{}{}
+\end{figure}
