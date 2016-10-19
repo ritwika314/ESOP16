@@ -1,4 +1,4 @@
-\section{Overview of Language and System}
+\section{Language and system overview}
 \label{sect:Overview}
 In this section, we give an overview of the system architecture within which \rolang programs execute and then discuss key language features with an example.
 
@@ -14,10 +14,13 @@ The shared memory abstraction provides single-writer and multi-writer distribute
 	\centering
 	\includegraphics[scale=0.4]{figs/arch.png}
 	\caption{\small Architecture of distributed system. Agent programs interact through shared variables. Each agent program also sets waypoints for its own controller which control the physical motion of the agent's platform. The agent platforms inhabit a shared physical environment, and therefore, also interact physically.}
+	\label{fig:arch}
 \end{figure}
 
 %\rolang allows users to write applications that will run on a distributed system of agents. 
-For this paper, we assume that all agents execute the same \rolang program. A program is a collection of \emph{variable declarations} and \emph{events}. 
+For this paper, we assume that all agents execute the same \rolang program; each agent knows the IDs of all participants; and there is a common coordinate system for the physical space within which the agents are operating. 
+%
+A program is a collection of \emph{variable declarations} and \emph{events}. 
 The language provides two types of shared variables:
 (a) a {\em multi-writer} shared variable $x$ is declared as $\MW$ and allows all agents to do reads and writes on $x$. 
 (b) a {\em single-writer\/} shared variable $x$ is declared as $\SW$ block, and it 
@@ -25,10 +28,28 @@ creates an array $x\langle \cdot \rangle$
 where the $i^{th}$ component $x \langle i \rangle$ can be read by all but can only be written to by agent $i$.
 %Local variables are declared in \verb|Loc|al declaration blocks.  \newline
 
-As mentioned earlier, \rolang uses a \emph{precondition-effect} style of programming. These precondition and effect statements form events. Each application consists of a special \verb|Init| event, and an \verb|EventBlock|. The \verb|Init| event occurs at the beginning when the application starts executing, and it contains all statements which need to be executed only once; for instance, initializing a shared array. After the \verb|Init| event is executed, the \verb|EventBlock| starts executing. It contains a list of events that define the behavior of the application. The preconditions of each of the events inside the \verb|EventBlock| are evaluated in order of appearance, and the effect is executed if the precondition becomes true. The \verb|EventBlock| can be seen as a (potentially) infinite while-loop. 
+A \rolang program is organized as a collection of events. Each event nominally has a precondition (or guard) and an effect. The effect is a sequence of program statements and it may be executed only when the precondition holds. An event is said to be enabled if its precondition holds. If multiple events of a given agent program are enabled, then any one of them is chosen.  
+%
+%
+% The \verb|EventBlock| can be seen as a (potentially) infinite while-loop. 
+%
+%
+There is a special event called \verb|Init|
+that is executed when the program starts. 
+% event, and an \verb|EventBlock|. The \verb|Init| event occurs at the beginning when the application starts executing, and it contains all statements which need to be executed only once; for instance, initializing a shared array. After the \verb|Init| event is executed, the \verb|EventBlock| starts executing. 
+ 
+\rolang provides a special operation \verb|doReach| for programs to interact with the agent's controller (see Figure~\ref{fig:arch}). 
+A call to \verb|doReach| instructs the controller to move towards a \emph{target} (position or configuration) while avoiding a set of \emph{obstacles}---both specified in the common coordinate system. Successive calls to \verb|doReach| may update the sequence of targets and obstacles. 
+%
+The controller communicates with the program using two flags: (a) \emph{doReach_done} is set if a neighborhood of the target is reached, and (b)\emph{doReach_fail} is set if the controller determined that it cannot reach the target while avoiding the obstacles. 
+%
+\sayan{Why different font for the flags? Use the same macros/conventions as in the code fragment.}
+%
+Implementations of  controllers for different kinds of agents platforms (e.g., ground rovers and quadcopters) provide different  best-effort strategies. 
+\sayan{In defining the semantics of \rolang the controller is treated as a parameter (see Section~\ref{missing}). Need to sharpen this statement.}
 
-We also provide an abstraction to manage the physical control of the agents, called \verb|doReach|, which takes as input a \emph{target} to reach, and a list of (predetermined) \emph{obstacles} which need to be avoided. We do not need to specify the format of the obstacles, as different implementations of this \verb|doReach| can have different specifications, but the target in general has the same type as the time varying variables of the system. \verb|doReach| communicates with the program using two flags, \emph{doReach_done}, and \emph{doReach_fail}. If the target is reached, the \emph{doReach_done} is set to true, and the \emph{doReach_fail} is set to true when the agent does not seem to have reached the target.
+% which need to be avoided. We do not need to specify the format of the obstacles, as different implementations of this \verb|doReach| can have different specifications, but the target in general has the same type as the time varying variables of the system. \verb|doReach| 
+ 
+%The next section presents the formal syntax, and an example to illustrate the structure of a general application. 
 
-The next section presents the formal syntax, and an example to illustrate the structure of a general application. 
-
-\input{syntax.tex}
+\input{example}
