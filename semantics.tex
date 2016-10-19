@@ -1,11 +1,22 @@
 \section[h]{Formal Semantics}
 \label{sect:semantics}
 
-In this section we describe the formal semantics of some major language elements. In doing so we use a parametrized formal semantics, where the parameters govern the intervals at which the system is observed(\refsect{exec}) and how the system evolves with respect to time(\refsect{dynamics}). Essentially, we specify the semantics of the language, provided there is a procedure to compute the physical control component of a system. For instance, in the race application described in \refsect{Eg}, we parameterize the language semantics with the procedure for computing the positions of the robots at a given time. The event block is like the discrete step of a hybrid automaton, and the dynamic behavior is the continuous trajectory\cite{hioa}. The discrete part of the system corresponds to the programs, which interact with the physical environment using the \s{doReach} abstraction. The programs communicate with each other using shared variables.
+In this section we describe the formal semantics of key language elements. 
+\sayan{This part will require some rewriting.}
+In doing so we use a parametrized formal semantics, where the parameters govern the intervals at which the system is observed(\refsect{exec}) and how the system evolves with respect to time(\refsect{dynamics}). Essentially, we specify the semantics of the language, provided there is a procedure to compute the physical control component of a system. For instance, in the race application described in \refsect{Eg}, we parameterize the language semantics with the procedure for computing the positions of the robots at a given time. The event block is like the discrete step of a hybrid automaton, and the dynamic behavior is the continuous trajectory\cite{hioa}. The discrete part of the system corresponds to the programs, which interact with the physical environment using the \s{doReach} abstraction. The programs communicate with each other using shared variables.
 
 We explain this further in the following sections, starting with a description of the system state. We then describe the major features of the language semantics, including the time model and the dynamics model, which parametrize the semantics. 
  
-A system consists of \textbf{N} agents $A_1$, ..., $A_N$. In the implementation, we assume that this $N$ is known beforehand. In \refsect{syntax}, we described the structure of applications written in this language; each application is written in terms of events. We say that an event has occurred if its precondition was evaluated as true, and the corresponding effect was executed. Once an event has occurred, the program control goes back to the top of the event block. The event block (\s{eventBlock}) is said to be executed when any event in the event block occurs once. Given an agent running an application, its event block can be executed repeatedly while the application continues to run. Communication between agents takes place through shared memory updates. Shared memory updates require mutual exclusion, which is implemented by a locking mechanism. We describe the \verb|atomic| construct, which is used for mutual exclusion, in \refsect{locking}.
+\sayan{resuming here}
+The system consists of \textbf{N} agents $A_1$, ..., $A_N$.  Formally, the state of the overall system advances in two alternating phases: 
+(a) During a {\em discrete\/} phase the agent programs execute events which may include reading and updating variables and setting waypoints for the controllers. All of this takes zero logical time.
+(b) During a {\em continuous\/} phase the physical environment of the agent evolves over a certain interval of time. During this period, time elapses, the agent platforms move according to the controllers, and the messages implementing the distributed shared memory abstraction are propagated. The changes brought about by the continuous phase are external to \rolang, and therefore, in providing an executable semantics these changes are relegated to an external  function.
+% resume here.
+ 
+ 
+
+
+In \refsect{syntax}, we described the structure of applications written in this language; each application is written in terms of events. We say that an event has occurred if its precondition was evaluated as true, and the corresponding effect was executed. Once an event has occurred, the program control goes back to the top of the event block. The event block (\s{eventBlock}) is said to be executed when any event in the event block occurs once. Given an agent running an application, its event block can be executed repeatedly while the application continues to run. Communication between agents takes place through shared memory updates. Shared memory updates require mutual exclusion, which is implemented by a locking mechanism. We describe the \verb|atomic| construct, which is used for mutual exclusion, in \refsect{locking}.
 
 
 \subsection[h]{Configuration}
