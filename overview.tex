@@ -9,14 +9,20 @@ The controller receives lists of way-points and obstacles from the agent's progr
 %
 The shared memory abstraction provides single-writer and multi-writer distributed shared variables using which an agent's program can communicate with another agent's program. 
 
-A \rolang program interacts with 
+%A \rolang program interacts with 
 \begin{figure}[t!]
 	\centering
 	\includegraphics[scale=0.4]{figs/arch.png}
 	\caption{\small Architecture of distributed system. Agent programs interact through shared variables. Each agent program also sets waypoints for its own controller which control the physical motion of the agent's platform. The agent platforms inhabit a shared physical environment, and therefore, also interact physically.}
 \end{figure}
 
-\rolang allows users to write applications that will run on a distributed system of agents. The user writes a program as though for a single agent, and all agents execute the same code. A \rolang program is a collection of \emph{declarations} and \emph{events}. Shared variables are used for communication between agents. They are declared in an \verb|MW| block. \verb|MW| stands for \emph{multi-writer}, implying that all agents can read from, and write to the variables declared in this block. We provide another type of shared variables called \emph{shared single-writer} variables, which all agents can read from, but only one agent can write to. These variables are parameterized by the \verb|agent index|, an integer which is a unique identifier for each agent in the system, and they are declared in the \verb|SW| block. Local variables are declared in \verb|Loc|al declaration blocks.  \newline
+%\rolang allows users to write applications that will run on a distributed system of agents. 
+For this paper, we assume that all agents execute the same \rolang program. A program is a collection of \emph{variable declarations} and \emph{events}. 
+The language provides two types of shared variables:
+(a) a {\em multi-writer} shared variable, declared in an \verb|allrw| block, allows all agents to read and write to the variable. 
+(b) a {\em single-writer\/} shared variable, declared in the \verb|shared| 
+% Resume here. 
+single-writer} variables, which all agents can read from, but only one agent can write to. These variables are parameterized by the \verb|agent index|, an integer which is a unique identifier for each agent in the system, and they are declared in the \verb|SW| block. Local variables are declared in \verb|Loc|al declaration blocks.  \newline
 
 As mentioned earlier, \rolang uses a \emph{precondition-effect} style of programming. These precondition and effect statements form events. Each application consists of a special \verb|Init| event, and an \verb|EventBlock|. The \verb|Init| event occurs at the beginning when the application starts executing, and it contains all statements which need to be executed only once; for instance, initializing a shared array. After the \verb|Init| event is executed, the \verb|EventBlock| starts executing. It contains a list of events that define the behavior of the application. The preconditions of each of the events inside the \verb|EventBlock| are evaluated in order of appearance, and the effect is executed if the precondition becomes true. The \verb|EventBlock| can be seen as a (potentially) infinite while-loop. 
 
