@@ -75,6 +75,28 @@ InCs():
  \end{figure}
  To ensure that this protocol works, the local \s{inCs} variable of at most one agent can be true at \s{time} $T$. \reffig{output1} shows that for \s{k} = 5 and \s{d} = 3, we can violate this property. For bounded executions, we were unable to find traces which violated this property when \s{d} was set to a value greater than \s{k}. 
  
- %\input{RaceMod.tex}
- 
- 
+\subsection{Race with non-atomic check}
+We revisit the race example from earlier, where a group of robots try to race to a predetermined set of points. In the \s{PickDest} state, the robots choose the next destination to race to.Then in the \s{Remove} stage, each robot \emph{atomically} updates the list of destinations to be visited if it reached the current destination. Recall that we put the check for whether an element is present in the shared list \s{dests} inside the atomic block. We now perform experiments with two versions of \s{doReachBB}, the physical control black box, where the atomic block only contains the update, but not the membership checking.  
+
+\begin{figure}[ht!]
+\label{fig:Race}
+\noindent\begin{minipage}{.5\textwidth}
+
+\begin{lstlisting}[mathescape = true]
+Agent::Race      
+			$\vdots$ 
+Remove():
+  pre(!Pick);
+  eff:
+    if(doReach_done):
+    	if(contains(
+    	    dests,currentDest)):
+            atomic:
+        		remove(dests,currentDest);
+    	Pick = true;
+ \end{lstlisting}
+ \end{minipage}\hfill
+ \caption{Race Application: non atomic membership checking}
+ \end{figure}
+
+\reffig{list1} shows an execution in which the agent cannot process the statement which asks to remove an \s{ItemPosition} from the \s{dests}, as between the time that it checked for membership and tried to update the list atomically, another agent already managed to remove the said \s{ItemPosition}. \reffig{list2} shows the final configuration of an execution with a different blackbox, which managed not to encounter this error. 

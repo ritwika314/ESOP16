@@ -1,8 +1,8 @@
 \subsection{The \textbf{K} Framework}
 \K~\cite{rosu-serbanuta-2013-k} is a rewrite-based executable framework for defining language semantics.
 Given a syntax and a semantics of a language, \K generates a parser, an interpreter, as well as formal analysis tools such as model checkers and deductive program verifiers at no additional cost.
-Using the interpreter, one can continuously test the semantics, which significantly improves the efficiency of semantics developers. 
-Moreover, the formal analysis tools facilitate formal reasoning about the given language semantics.
+\K also provides several formal analysis tools, which will enable us to perform formal reasoning about the language we have defined using this framework. 
+
 This helps both in terms of applicability of the semantics and in terms of engineering the semantics itself; for instance, the state-space exploration capability helps the language designer cover all the non-deterministic behaviors of certain language constructs or combinations of them in the language definition.
 
 We briefly describe \K here. In \K, a language syntax is defined using conventional Backus-Naur Form (BNF).
@@ -11,19 +11,13 @@ A configuration is an algebraic representation of the program code and state.
 Intuitively, it is a tuple whose elements (i.e. cells) are labeled and possibly nested. 
 Each cell represents a semantic component such as store, environment and thread that is used in the semantics.
 A special cell, named \s{k}, contains a list of computation to be executed.
-A computation is a program fragment, while the original program is flattened into a sequence of computations.
+A computation is a program fragment, while the original program is flattened into a sequence of computations or programming tasks.
 A rule describes a one-step transition between configurations.
 Rules are modular; they mention only relevant cells needed in each rule.
 The cells are represented with angle brackets notation.
 The horizontal line represents a reduction (i.e. a transition relation).
 A cell with no horizontal line means that it is read but not changed by the rule.
-The lookup rule mentions three cells: \s{k}, \s{env} and \s{store}.
-The \s{k} cell contains a list of computations to be executed, and the \s{env} cell is a map of variables to their locations and the \s{store} is a map from locations to actual values.
-This rule is applied when the current computation (top of the \s{k} cell) is a variable lookup expression \w{X} and \w{X} is matched in the environment with a location \w{L} in the the location \w{L} is matched in the store with a value \w{V}.
-This rule reduces the variable lookup \w{X} to the value \w{V}.
-The ``...'' is a structural frame, that is, it matches the portions of a cell that are neither read nor written by the rule.
 
 To model the behaviors and interactions between agents, an appealing aspect of \K is its inherent support for non-determinism.
-As \K i based on rewriting logic \cite{meseguer2007rewriting}, one can easily define, execute, and reason about non-deterministic specifications in \K. 
-\K can capture non-deterministic features both related to concurrency and to the under-specification (e.g., order of evaluation). 
-In our work, we are more interested in the non-determinism caused by concurrency. In particular, using \K's `search'-mode execution, one can explore all possible interleaving executions.
+As \K is based on rewriting logic \cite{meseguer2007rewriting}, one can easily define, execute, and reason about non-deterministic specifications in \K. 
+\K can capture non-deterministic features both related to concurrency and to the order of evaluation. 

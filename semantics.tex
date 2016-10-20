@@ -77,7 +77,6 @@ Note that when the \s{endEventBlock} is encountered, we rewrite the entire \s{k}
 \paragraph{Time Advance Transition:}
 Suppose that the \s{counterMap} cell, which maintains a map of ids to counter values of all agents, is $CM$. \s{findMax} and \s{findMin} are functions for computing the maximum and minimum in the range of a map respectively. If both the minimum and maximum values are equal, then all values in the range of the map are equal.  The \s{time advance} transition says that, given that the current global time is $T$, if all the counter values in $CM$ are equal to $n_0$, the global time is rewritten to $T+\delta$. The \s{transitionState} is set to \verb|dynamic| from \verb|discrete|. We do not show the rest of the configuration items because they do not appear in the condition or change with the time progression rule. 
 \input{time.tex}. 
-\vspace{-4mm}
 It is worth mentioning that while we designed the time progression such that the event block executes exactly $n_0$ number of times for each agent, we can easily change the design to accommodate different values for different agents. To do that, we modify the time model by adding another parameter $\rho$ to it. $\rho$ is a map from agent \s{ids} to integers. Instead of incrementing the counter by one every time an event occurs, agent with it $i$ increments its counter by $\rho[i]$. The number of times its event block executes is then $\floor{\frac{n_0}{\rho[i]}}$.
 
 

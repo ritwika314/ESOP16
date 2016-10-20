@@ -1,5 +1,18 @@
 \section{Preliminaries}
 \label{sect:Prelim}
 
-%\input{kdescrip.tex}
+\input{kdescrip.tex}
 
+\subsection{The \StarL robotics framework}
+We are developing \rolang to interface with the Stabilizing Robotics Language (\StarL). 
+\StarL is primarily in Java, and it provides language constructs for coordination and control
+across robots.Two key features of \StarL are a distributed shared memory (DSM) primitive
+for coordination and a reach-avoid primitive for control. DSM allows a
+program to declare program variables that are shared across multiple robots
+. This enables programs running on different
+robots to communicate by writing-to and reading from the shared variable.
+
+All the program threads implementing the application, the message channels,
+as well as the physical environment of the application (robot chassis, obstacles)
+are modeled as hybrid automata, and the overall system is described
+by a giant composition of these automata. 

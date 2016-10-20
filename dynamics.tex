@@ -13,8 +13,8 @@ The \s{doReach} component interfaces with the application using flags \s{doReach
 \kprefix{agent}{
 \begin{array}{@{}c@{}}
 \kprefix{k}{
- \reduce{\dotCt{\terminal{doReach} (T:ItemPosition,O:ObstacleList)}}{{\dotCt{}}} \curvearrowright resetFlags(i) \curvearrowright setTargetObs(T,O,T_0,i)
-}
+ \reduce{\dotCt{\terminal{doReach} (T,O)}}{{\dotCt{}}} \curvearrowright resetFlags(i) \curvearrowright setTargetObs(T,O,T_0,i)
+} 
 \kall{id}{\variable[Int]{i}}\mathrel{}
 \end{array}
 }
@@ -37,4 +37,5 @@ The \s{doReach} component interfaces with the application using flags \s{doReach
 \kall{transitionState}{dynamic}}
 {N \mathrel{==_{\scriptstyle\it Int}} n_0 \terminal{and} P_{1} = \terminal{doReachBB}(P,T,O,T_0,\delta,i)}{}{}{}
 \end{figure}
+
 
