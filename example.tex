@@ -1,40 +1,105 @@
 \subsection[h]{An Illustrative Example}
 \label{sect:Eg}
-We present a simple illustrative example to demonstrate some of the features of the language, and to aid discussion in future sections. We want to design an application where (a group of) robots try to visit a predetermined sequence of waypoints, with predetermined obstacles. We aim to ensure that a robot choosing the next destination will not pick a waypoint that has already been visited by some robot. The code for this application is as follows.
-\newline
-\begin{Verbatim}[fontsize =\footnotesize]
+We present a simple illustrative example to demonstrate some of the features of the language, and to aid discussion in future sections. We want to design an application where (a group of) robots try to visit a predetermined sequence of waypoints, with predetermined obstacles. We aim to ensure that a robot choosing the next destination will not pick a waypoint that has already been visited by some robot. The code for this application is provided in \reffig{Race}.
+
+\begin{figure}[ht!]
+\label{fig:Race}
+\noindent\begin{minipage}{.5\textwidth}
+
+\begin{lstlisting}
 Agent::Race
 
-MW:
-    List<ItemPosition> dests = getInput();
-SW:
+allwrite:
+	List<ItemPosition> dests 
+    	= getInput();
+allread:
 
-Loc:
-    ObstacleList obs = getObs();
-    boolean Pick = true; 
-    ItemPosition currentDest;
+loc:
+  ObstacleList obs = getObs();
+  boolean Pick = true; 
+  ItemPosition currentDest;
 Init:
 
 Pick():
-      pre(Pick);
-      eff:
-        if (isEmpty(dests)):
-        exit();   
-        else :
-        currentDest = head(dests);
-            doReach(currentDest,obs);
-            Pick = false;
+  pre(Pick);
+  eff:
+    if (isEmpty(dests)):
+    exit();   
+ \end{lstlisting}
+ \end{minipage}\hfill
+\noindent\begin{minipage}{.5\textwidth}
 
-  Remove():
-      pre(!Pick);
-      eff:
-        if(doReach_done):
-          atomic:
-            if(contains(dests,currentDest)):
-              remove(dests,currentDest);
-          Pick = true;
-\end{Verbatim}
+\begin{lstlisting}
+    else :
+      currentDest = head(dests);
+      doReach(currentDest,obs);
+      Pick = false;
+      
+Remove():
+  pre(!Pick);
+  eff:
+    if(doReach_done):
+      atomic:
+        if(contains(
+        dests,currentDest)):
+        remove(dests,currentDest);
+    Pick = true;
+ \end{lstlisting}
+ \end{minipage}\hfill
+ \caption{Race Application}
+ \end{figure}
+\verb|ItemPosition| is a built-in datatype which is used to represent the position of the robot (the physical coordinates $(x,y,z)$). The robots have a shared list of \verb|ItemPosition|s (\verb|dests|) which is initialized using the built-in function \verb|getInput|. We define a boolean variable \verb|Pick| which determines whether the robots are in the stage of picking and moving to the current destination (\verb|currentDest|), or removing the current destination from the shared list of destinations, since it was visited. Functions such as \verb|getInput()|, \verb|getObs()| are provided as uninterpreted functions, which can be defined in an external language as long as they return values with consistent types. \footnote{Changing this line}
 
+ When the next destination in the race is set, the robots try to reach it while avoiding the provided obstacles. Then in the \verb|Remove| stage, each robot \emph{atomically} updates the list of destinations to be visited if it reached the current destination. The \verb|atomic| construct ensures mutual exclusion while updating a shared variable. The function \verb|remove| can only remove an item from a list if it contains said item, the execution gets stuck otherwise. With that in mind, we added a check for whether the \verb|currentDest| is contained in \verb|dests| \emph{within} the atomic block; to ensure that between this check and atomically trying to remove the list element, another robot didn't successfully already remove the same element. \subsection[h]{An Illustrative Example}
+\label{sect:Eg}
+We present a simple illustrative example to demonstrate some of the features of the language, and to aid discussion in future sections. We want to design an application where (a group of) robots try to visit a predetermined sequence of waypoints, with predetermined obstacles. We aim to ensure that a robot choosing the next destination will not pick a waypoint that has already been visited by some robot. The code for this application is provided in \reffig{Race}.
+
+\begin{figure}[ht!]
+\label{fig:Race}
+\noindent\begin{minipage}{.5\textwidth}
+
+\begin{lstlisting}
+Agent::Race
+
+allwrite:
+	List<ItemPosition> dests 
+    	= getInput();
+allread:
+
+loc:
+  ObstacleList obs = getObs();
+  boolean Pick = true; 
+  ItemPosition currentDest;
+Init:
+
+Pick():
+  pre(Pick);
+  eff:
+    if (isEmpty(dests)):
+    exit();   
+ \end{lstlisting}
+ \end{minipage}\hfill
+\noindent\begin{minipage}{.5\textwidth}
+
+\begin{lstlisting}
+    else :
+      currentDest = head(dests);
+      doReach(currentDest,obs);
+      Pick = false;
+      
+Remove():
+  pre(!Pick);
+  eff:
+    if(doReach_done):
+      atomic:
+        if(contains(
+        dests,currentDest)):
+        remove(dests,currentDest);
+    Pick = true;
+ \end{lstlisting}
+ \end{minipage}\hfill
+ \caption{Race Application}
+ \end{figure}
 \verb|ItemPosition| is a built-in datatype which is used to represent the position of the robot (the physical coordinates $(x,y,z)$). The robots have a shared list of \verb|ItemPosition|s (\verb|dests|) which is initialized using the built-in function \verb|getInput|. We define a boolean variable \verb|Pick| which determines whether the robots are in the stage of picking and moving to the current destination (\verb|currentDest|), or removing the current destination from the shared list of destinations, since it was visited. Functions such as \verb|getInput()|, \verb|getObs()| are provided as uninterpreted functions, which can be defined in an external language as long as they return values with consistent types. \footnote{Changing this line}
 
  When the next destination in the race is set, the robots try to reach it while avoiding the provided obstacles. Then in the \verb|Remove| stage, each robot \emph{atomically} updates the list of destinations to be visited if it reached the current destination. The \verb|atomic| construct ensures mutual exclusion while updating a shared variable. The function \verb|remove| can only remove an item from a list if it contains said item, the execution gets stuck otherwise. With that in mind, we added a check for whether the \verb|currentDest| is contained in \verb|dests| \emph{within} the atomic block; to ensure that between this check and atomically trying to remove the list element, another robot didn't successfully already remove the same element. 

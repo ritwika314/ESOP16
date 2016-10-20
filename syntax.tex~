@@ -1,4 +1,5 @@
 \subsection{Syntax}
+\iffalse
 \label{sect:syntax}
 This section describes the formal syntax of \rolang. We first provide the major features of the formal syntax which describe program structure, event structure, and statement structure. 
 \begin{mdframed}
@@ -47,3 +48,5 @@ This section describes the formal syntax of \rolang. We first provide the major 
 As mentioned in the overview, each program consists of three major parts, with variable declarations, an initialization block and an event block. Aside from usual data types and arrays, we provide support for declaring enumerated types, as it is easy to use them as "stages" in applications.\footnote{https://github.com/ritwika314/RoLang/StarL/HLL/Examples/LeaderElect}
 
 Events, as mentioned earlier are specified by precondition-effect blocks, where the precondition is a boolean expression, and effect blocks contain statements, which can be assignment statements, \verb|if-then-else| statements, \verb|Atomic| statements, function calls, or loops. We omit the productions for the more obvious syntactic elements like expressions, assignment statements, loops, etc.\footnote{https://github.com/ritwika314/RoLang/StarL/HLL/Semantics/agent-syntax.k}
+\fi
+\input{example.tex}
