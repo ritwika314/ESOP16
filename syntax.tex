@@ -1,8 +1,10 @@
 \subsection{Syntax}
 \label{sect:syntax}
 This section describes the formal syntax of \rolang. We first provide the major features of the formal syntax which describe program structure, event structure, and statement structure. 
-\begin{mdframed}
+\begin{figure}[ht!]
+\footnotesize
 \begin{center}
+\noindent\begin{minipage}{.5\textwidth}
 \begin{grammar}
 <Pgm> :: <VarDecls> <InitBlock> <EventBlock>
 
@@ -23,7 +25,10 @@ This section describes the formal syntax of \rolang. We first provide the major 
          | <Type> <Var> "=" <Expr>
  
 <InitBlock> :: "Init :" <Stmts>
-
+\end{grammar}
+\end{minipage}\hfill
+\noindent\begin{minipage}{.5\textwidth}
+\begin{grammar}
 <EventBlock> :: "EventBlock:" <Events>
 
 <Events> :: <Event> <Events> | <Event>
@@ -41,9 +46,11 @@ This section describes the formal syntax of \rolang. We first provide the major 
         
 <Atomic> :: "Atomic :" Stmts
 \end{grammar}
+\end{minipage}
 \end{center}
-\end{mdframed}
-
+\caption{Language Syntax Features}
+\end{figure}
 As mentioned in the overview, each program consists of three major parts, with variable declarations, an initialization block and an event block. Aside from usual data types and arrays, we provide support for declaring enumerated types, as it is easy to use them as "stages" in applications.\footnote{https://github.com/ritwika314/RoLang/StarL/HLL/Examples/LeaderElect}
 
 Events, as mentioned earlier are specified by precondition-effect blocks, where the precondition is a boolean expression, and effect blocks contain statements, which can be assignment statements, \verb|if-then-else| statements, \verb|Atomic| statements, function calls, or loops. We omit the productions for the more obvious syntactic elements like expressions, assignment statements, loops, etc.\footnote{https://github.com/ritwika314/RoLang/StarL/HLL/Semantics/agent-syntax.k}
+\newpage

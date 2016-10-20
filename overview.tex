@@ -10,7 +10,7 @@ The controller receives lists of way-points and obstacles from the agent's progr
 The shared memory abstraction provides single-writer and multi-writer distributed shared variables using which an agent's program can communicate with another agent's program. 
 
 %A \rolang program interacts with 
-\begin{figure}[t!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[scale=0.4]{figs/arch.png}
 	\caption{\small Architecture of distributed system. Agent programs interact through shared variables. Each agent program also sets waypoints for its own controller which control the physical motion of the agent's platform. The agent platforms inhabit a shared physical environment, and therefore, also interact physically.}
@@ -38,10 +38,10 @@ There is a special event called \verb|Init|
 that is executed when the program starts. 
 % event, and an \verb|EventBlock|. The \verb|Init| event occurs at the beginning when the application starts executing, and it contains all statements which need to be executed only once; for instance, initializing a shared array. After the \verb|Init| event is executed, the \verb|EventBlock| starts executing. 
  
-\rolang provides a special operation \verb|doReach| for programs to interact with the agent's controller (see Figure~\ref{fig:arch}). 
-A call to \verb|doReach| instructs the controller to move towards a \emph{target} (position or configuration) while avoiding a set of \emph{obstacles}---both specified in the common coordinate system. Successive calls to \verb|doReach| may update the sequence of targets and obstacles. 
+\rolang provides a special operation \s{doReach} for programs to interact with the agent's controller (see Figure~\ref{fig:arch}). 
+A call to \s{doReach} instructs the controller to move towards a \emph{target} (position or configuration) while avoiding a set of \emph{obstacles}---both specified in the common coordinate system. Successive calls to \s{doReach} may update the sequence of targets and obstacles. 
 %
-The controller communicates with the program using two flags: (a) \emph{doReach_done} is set if a neighborhood of the target is reached, and (b)\emph{doReach_fail} is set if the controller determined that it cannot reach the target while avoiding the obstacles. 
+The controller communicates with the program using two flags: (a) \s{doReach_done} is set if a neighborhood of the target is reached, and (b) \s{doReach_fail} is set if the controller determined that it cannot reach the target while avoiding the obstacles. 
 %
 \sayan{Why different font for the flags? Use the same macros/conventions as in the code fragment.}
 %

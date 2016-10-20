@@ -1,0 +1,40 @@
+\subsection{Dynamics}
+\label{sect:dynamics}
+We first present the semantic rules involving the \s{doReach} abstraction. 
+
+\paragraph{doReach transition}
+The \s{doReach} component interfaces with the application using flags \s{doReach\_done} and \s{doReach\_fail}. When \s{doReach} is invoked, the blackbox containing the implementation of \s{doReach} is called. Recall that \s{doReach} takes two arguments, the \emph{target}, and the \emph{obstacle}. The exact format of the obstacle is irrelevant to the semantics, as it is used by implementation specific objects in the \s{doReach} blackbox. \s{doReach} is technically invoked at each time increment. The target and the obstacles are set to current position and empty initially, unless the application specifies otherwise. Again, we omit the details of how we store these in the configuration. We now provide the rule to process the \s{doReach} statement when it appears in the application. 
+
+
+\paragraph{doReach update transition: }When a \s{doReach} statement is encountered in the program, the statement itself is rewritten to empty. The $\curvearrowright$ is used to break down the program, which is seen as a single task, into a sequence of tasks. Therefore, it means after rewriting the \s{doReach} to empty, the \s{doReach} flags should be reset(\s{doReach\_done,doReach\_fail} are both set to false), which should in turn be followed by setting the target of this agent, and the list of obstacles. The \s{setTargetObs} function sets the values of target, obstacle , and current time. 
+\begin{figure}
+\label{fig:lock1}
+\krule[doreach update transition]{
+\kprefix{agent}{
+\begin{array}{@{}c@{}}
+\kprefix{k}{
+ \reduce{\dotCt{\terminal{doReach} (T:ItemPosition,O:ObstacleList)}}{{\dotCt{}}} \curvearrowright resetFlags(i) \curvearrowright setTargetObs(T,O,T_0,i)
+}
+\kall{id}{\variable[Int]{i}}\mathrel{}
+\end{array}
+}
+\kall{time}{T_0}
+}{}{}{}{}
+\end{figure}
+\vspace{-2mm}
+\paragraph{doReach invoke transition} Recall that the \s{transitionState} cell of the system is set to \s{dynamic} when all the \s{counter} values of all agents reach $n_0$. Suppose the current \s{time} is $T_0$ The time advances by $\delta$. We then invoke the blackbox \s{doReachBB} to compute the new contents of the \s{position} cell of each agent at time $T_0 +\delta$, given that the position of the agent at time $T_0$ was $P$, the target \s{ItemPosition} is $T$, obstacles were stored in $O$, and the time increment was $\delta$. We omit the details of maintaining $T_0$, $O$ and $T$.
+\begin{figure}
+\label{fig:lock1}
+\krule[doreach invoke transition]{
+\kprefix{agent}{
+\begin{array}{@{}c@{}}
+\kall{id}{\variable[Int]{i}}
+\kall{counter}{\reduce{N}{0}}
+\kall{position}{\reduce{\variable[ItemPosition]P}{P_{1}}}
+\end{array}
+}\mathrel{}
+\kmiddle{counterMap}{\reduce{i\mapsto N}{i \mapsto 0}}
+\kall{transitionState}{dynamic}}
+{N \mathrel{==_{\scriptstyle\it Int}} n_0 \terminal{and} P_{1} = \terminal{doReachBB}(P,T,O,T_0,\delta,i)}{}{}{}
+\end{figure}
+

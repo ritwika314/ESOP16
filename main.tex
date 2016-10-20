@@ -51,6 +51,32 @@
 \usepackage{mathtools}
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\lstdefinelanguage{myLang}
+{
+  language     = Java,
+  % list of keywords
+  morekeywords={
+    import,
+    if,
+    while,
+    for,Agent,allwrite,allread,Init,pre,eff,atomic,loc
+  },
+  sensitive=false, % keywords are not case-sensitive
+  morecomment=[l]{//}, % l is for line comment
+  morecomment=[s]{/*}{*/}, % s is for start and end delimiter
+  morestring=[b]" % defines that strings are enclosed in double quotes
+}
+\lstdefinestyle{myCustomStyle}{
+keywordstyle=\color{blue},
+language=myLang,
+stepnumber=1,
+  numbersep=10pt,
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false
+}
+\lstset{basicstyle=\footnotesize,style = myCustomStyle}
+
 \begin{document}
 %\input{init.tex}
 %\input{abstract.tex}
@@ -61,7 +87,7 @@
 \input{prelim.tex}
 \input{semantics.tex}
 \input{syntax.tex}
-%\input{experiments.tex}
+\input{experiments.tex}
 %$\input{conclusions.tex}
 %\input{futurework.tex}
 

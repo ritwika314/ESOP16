@@ -105,4 +105,4 @@ An agent is in the process of executing the effect of an event whose preconditio
 \paragraph{Lock Release Transition}
 Once the atomic block has been executed, the lock must be released, the agent must take itself out of the \s{lockQueue}, and set its own \s{lockState} to \s{idle}. The rest of the event continues to execute. Recall that in the lock request transition, we added a terminal \s{atomicEnd} after the atomic block. We can now use that to identify where the atomic block ends. 
 \input{locking4.tex}
-%\input{dynamics.tex}
+\input{dynamics.tex}
