@@ -12,69 +12,166 @@ Since the passage of time should correspond to the increments of the variables \
 Agent::Fischer
 
 allwrite:
-	int reqid = -1; 
-    int k = 5;
-    int d = 3;
+  int reqid = -1; 
+  int k = 10;
+  int d = 2;
 allread:
 
 loc:
-	int id = getAgentIndex();
-	int waitTime = rand(k); 
-    bool inCs = false;
-    int c1 = 0;
-    int c2 = 0;
-	int cstime = rand(5);
-    int c3 = 0;
+  int id = getAgentIndex();
+  int waitTime = rand(k);
+  bool start = true;
+  bool assign = false;
+  bool delay = false;
+  bool wait = false;
+  
+  bool inCs = false;
+  int c1 = 0;
+  int c2 = 0;
+  int cstime = rand(5);
+  int c3 = 0;
+  
 Init:
 
-request():
-  pre(c1<waitTime);
+Start():
+  pre(start);
   eff:
-  	c1=c1 + 1;
-wait():
-  pre(c1 == waitTime and c2 < d);
+  	if (reqid != -1):
+    	c1 = 0;
+    else:
+      start = false;
+      wait = true;
+
+Wait():
+  pre(wait);
   eff:
-      if(reqid == -1):
-          c2 = 0;
+      if(c1 < waitTime):
+          c1 = c1+1;
  \end{lstlisting}
  \end{minipage}\hfill
 \noindent\begin{minipage}{.5\textwidth}
 
-\begin{lstlisting}
- 		atomic:
-        reqid = id;
-        c2 = c2+1;  
+\begin{lstlisting}  
       else:
-      	c2 = c2+1;
+      	c1 = 0;
+        wait = false;
+        assign = true;
 
-TryCs():
-  pre(c2 == d);
+Assign():
+  pre(assign);
   eff:
-    if (reqid == id) :
-    	inCs = true;
-    c2 = 0;
-    c1 = 0;
+    atomic:
+   	 reqid = id;
+    delay = true;
+    assign = false;
+    
+Delay():
+  pre(delay);
+  eff:
+    if (c2 < d):
+    	c2 = c2+1;
+    else:
+      if (reqid != id):
+        c2 = 0;
+        c1 = 0;
+        delay = false;
+        wait = true;
+      else:
+      	inCs = true;
+        wait = false;
 
 InCs():
-	pre(inCs == true);
-    eff:
-    	if (c3 < cstime):
-        	c3 = c3 +1;
+	pre(inCs);
+    eff: 
+    	if (c3 < 3):
+        	c3 = c3 + 1 ;
         else:
-        	c3 = 0;
-            c1 = 0;
-            inCs = false;
-            atomic:
-        		if (eqid == id):
-                	reqid = -1
-   
-
+          c3 = 0;
+          inCs = false;
+          start = true;
+          atomic:
+            reqid = -1;
+    	
  \end{lstlisting}
  \end{minipage}\hfill
  \caption{Fischer's  protocol}
  \end{figure}
- To ensure that this protocol works, the local \s{inCs} variable of at most one agent can be true at \s{time} $T$. \reffig{output1} shows that for \s{k} = 5 and \s{d} = 3, we can violate this property. For bounded executions, we were unable to find traces which violated this property when \s{d} was set to a value greater than \s{k}. 
  
+ To ensure that this protocol works, the local \s{inCs} variable of at most one agent can be true at \s{time} $T$. The assignment stage takes at least 2 increments of time, as we increment the counter every time an agent makes a lock request, and in this example, the time also increments as soon as the counter is incremented. The following execution trace shows that for \s{d} = 2, we can violate this property. For bounded executions, we were unable to find traces which violated this property when \s{d} was set to a value greater than 2 , which is expected. 
+ \begin{figure}[H]
+\begin{verbatim}
+ <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
+ c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
+ delay |-> 10 d |-> 5 c2 |-> 14 
+ </memory> <id> 0 </id> 
+ </agent> 
+ <agent> ... <memory> start |-> 22 wait |-> 25 inCs |-> 26 cstime |-> 29
+ c1 |-> 27 c3 |-> 30 reqid |-> 17 id |-> 20 k |-> 18 waitTime |-> 21 
+ assign |-> 23 delay |-> 24 d |-> 19 c2 |-> 28 
+ </memory> <id> 1 </id> 
+ </agent>
+ <gMemory> reqid |-> 0 k |-> 1 d |->  2 </gMemory>
+ <MMap> 0 |-> -1 1 |-> 10 2 |-> 2 3 |-> -1 4 |-> 10 5 |-> 2 6 |-> 0 7 |-> 6
+ 8 |-> true 9 |-> false 10 |-> false 11 |-> false 12 |-> false 13 |-> 0
+ 14 |-> 0  15 |-> 3 16 |-> 0 17 |-> -1 18 |-> 10 19 |-> 2 20 |-> 1 
+ 21 |-> 3 22 |-> true 23 |-> false 24 |-> false 25 |-> false 26 |-> false
+ 27 |-> 0 28 |-> 0 29 |-> 5 30 |-> 0 
+ </MMap>
+ <time> 0 </time>
+\end{verbatim}
+\end{figure}
+At time = 0; both the agents have executed the \s{Start} event, indicated by the fact that the \s{start} variables of both agents, corresponding to addresses \verb|8| and \verb|22| respectively, map to \verb|false| in the \s{MMap}. The \s{waitTime} for agent with agent 0 is stored at address \verb|7|, and is seen from the \s{MMap} to be 6. The \s{waitTime} for agent 1 is seen to be 3.   
+
+At time = 4, agent 1 is seen to be executing \s{Assign} event, as evidenced by the fact that variable \s{assign} for agent 1 stored at address \verb|23| is true. Agent 0 is still waiting to start its \s{Assign} event, since its \s{c1} is still 4 and its \s{waitTime} is 6.  
+ \begin{figure}[H]
+\begin{verbatim}
+ <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
+ c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
+ delay |-> 10 d |-> 5 c2 |-> 14 
+ </memory> <id> 0 </id> 
+ </agent> 
+ <agent> ... <memory> start |-> 22 wait |-> 25 inCs |-> 26 cstime |-> 29
+ c1 |-> 27 c3 |-> 30 reqid |-> 17 id |-> 20 k |-> 18 waitTime |-> 21 
+ assign |-> 23 delay |-> 24 d |-> 19 c2 |-> 28 
+ </memory> <id> 1 </id> 
+ </agent>
+ <gMemory> reqid |-> 0 k |-> 1 d |->  2 </gMemory>
+ <MMap> 0 |-> -1 1 |-> 10 2 |-> 2 3 |-> -1 4 |-> 10 5 |-> 2 6 |-> 0 7 |-> 6
+ 8 |-> false 9 |-> false 10 |-> false 11 |-> true 12 |-> false 13 |-> 4
+ 14 |-> 0  15 |-> 3 16 |-> 0 17 |-> -1 18 |-> 10 19 |-> 2 20 |-> 1 
+ 21 |-> 3 22 |-> false 23 |-> true 24 |-> false 25 |-> false 26 |-> false
+ 27 |-> 0 28 |-> 0 29 |-> 5 30 |-> 0 
+ </MMap>
+ <time> 4 </time>
+\end{verbatim}
+\end{figure}
+At time = 11, we see that the \s{inCs} values of both agents are true, which violates the correctness of this protocol. 
+ \begin{figure}[H]
+\begin{verbatim}
+ <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
+ c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
+ delay |-> 10 d |-> 5 c2 |-> 14 
+ </memory> <id> 0 </id> 
+ </agent> 
+ <agent> ... <memory> start |-> 22 wait |-> 25 inCs |-> 26 cstime |-> 29
+ c1 |-> 27 c3 |-> 30 reqid |-> 17 id |-> 20 k |-> 18 waitTime |-> 21 
+ assign |-> 23 delay |-> 24 d |-> 19 c2 |-> 28 
+ </memory> <id> 1 </id> 
+ </agent>
+ <gMemory> reqid |-> 0 k |-> 1 d |->  2 </gMemory>
+ <MMap> 0 |-> 0 1 |-> 10 2 |-> 2 3 |-> 0 4 |-> 10 5 |-> 2 6 |-> 0 7 |-> 6
+ 8 |-> false 9 |-> false 10 |-> false 11 |-> false 12 |-> true 13 |-> 0
+ 14 |-> 0  15 |-> 3 16 |-> 0 17 |-> 0 18 |-> 10 19 |-> 2 20 |-> 1 
+ 21 |-> 3 22 |-> false 23 |-> false 24 |-> false 25 |-> false 26 |-> true
+ 27 |-> 0 28 |-> 0 29 |-> 5 30 |-> 3 
+ </MMap>
+ <time> 11 </time>
+\end{verbatim}
+\end{figure}
+During this execution, as agent 0 was assigning the \s{reqid} to its own \s{id}, agent 1 had entered the \s{delay} state. 
+When the agent 1 checked whether it can enter the critical section, agent 0 hadn't assigned \s{reqid} to its own it. Agent 1 set \s{inCs} to true, which signifies that it is in the critical section, and still is in it when agent 0 enters after satisfying all requirements. 
+
+
 \subsection{Race with non-atomic check}
 We revisit the race example from earlier, where a group of robots try to race to a predetermined set of points. In the \s{PickDest} state, the robots choose the next destination to race to.Then in the \s{Remove} stage, each robot \emph{atomically} updates the list of destinations to be visited if it reached the current destination. Recall that we put the check for whether an element is present in the shared list \s{dests} inside the atomic block. We now perform experiments with two versions of \s{doReachBB}, the physical control black box, where the atomic block only contains the update, but not the membership checking.  
 
@@ -98,5 +195,7 @@ Remove():
  \end{minipage}\hfill
  \caption{Race Application: non atomic membership checking}
  \end{figure}
+
+
 
 \reffig{list1} shows an execution in which the agent cannot process the statement which asks to remove an \s{ItemPosition} from the \s{dests}, as between the time that it checked for membership and tried to update the list atomically, another agent already managed to remove the said \s{ItemPosition}. \reffig{list2} shows the final configuration of an execution with a different blackbox, which managed not to encounter this error. 
