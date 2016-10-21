@@ -22,7 +22,10 @@ The \s{doReach} component interfaces with the application using flags \s{doReach
 }{}{}{}{}
 \end{figure}
 \vspace{-2mm}
-\paragraph{doReach invoke transition} Recall that the \s{transitionState} cell of the system is set to \s{dynamic} when all the \s{counter} values of all agents reach $n_0$. Suppose the current \s{time} is $T_0$ The time advances by $\delta$. We then invoke the external function \s{doReachBB} to compute the new contents of the \s{position} cell of each agent at time $T_0 +\delta$, given that the position of the agent at time $T_0$ was $P$, the target \s{ItemPosition} is $T$, obstacles were stored in $O$, and the time increment was $\delta$. We omit the details of maintaining $T_0$, $O$ and $T$.
+\paragraph{doReach invoke transition} Recall that the \s{transitionState} cell of the system is set to \s{dynamic} when all the \s{counter} values of all agents reach $n_0$. Suppose the current \s{time} is $T_0$ The time advances by $\delta$. 
+%
+
+
 \begin{figure}
 \label{fig:lock1}
 \krule[doreach invoke transition]{

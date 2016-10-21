@@ -49,22 +49,23 @@ In the \texttt{Race} application of \refsect{Eg}, for example, the state updates
  Cells may be nested, that is, contain other cells. 
  %A {\em computation\/} is a program fragment, while the original program is flattened into a sequence of computations or programming tasks.
  %
-A {\em rewrite rule\/} describes a one-step transition between configurations. 
-  For example, \reffig{krule} is a lookup rule in \K. 
-
-\begin{figure}[h]
-\label{fig:krule}
+ 
+A {\em rewrite rule\/} describes a one-step transition between configurations.  For example,the following is a lookup rule. 
+%\begin{figure}[h!]
+%\label{fig:krule}
+%\centering
+The horizontal line represents a rewrite from previous term (above) to result(below). Cells without a rewrite, such as
+$\kall{memory}{X \mapsto V}$, are read, but not changed by the rewrite.  The ellipsis ($\cdots$)  matches the portions of a cell that are neither read nor written by the rule.
+%
+\vspace{0.25cm}
 \krule[lookup]{
  \kprefix{k}{\reduce{\variable{X}}{\variable{V}}} \mathrel{}
   \kmiddle{memory}{\variable{X} \mapsto \variable{V}} \mathrel{}
   }{}{}{}{}
-\end{figure}
-The cells are represented within angular brackets. The horizontal line represents a rewrite, with the previous term above it, and the result of the rewrite below it. A cell without a rewrite requires being read, but not changed by the rule.
-The lookup rule mentions two cells: \s{k}, and \s{memory}.
-
-This rule is applied when the current computation (top of the \s{k} cell) is a look-up expression \w{X}, \w{X} is matched in the \s{memory} with a value \w{V}.
-This rule rewrites the variable look-up \w{X} to the value \w{V}.
-The ``...'' is a structural frame, that is, it matches the portions of a cell that are neither read nor written by the rule.
+%\end{figure}
+%
+\noindent
+This rule is applied when the current computation is a look-up expression \w{X}; \w{X} is mapped to  a value \w{V} in  \s{memory}. The rule rewrites   \w{X} to \w{V}.
  
  
 
@@ -111,50 +112,44 @@ The top-level system configuration cell is called  \s{system} (Figure~\ref{fig:h
 The next subsections describe the semantics of \rolang in terms of rewriting rules for  \s{system} configurations. 
 
 \subsection[h]{Local Variable Declaration}
-A declaration:
+A statement:
 \begin{lstlisting}
 local T x;
 \end{lstlisting}	
 declares a local variable called \s{x} of type \s{T}.
-The following rewriting rule captures local variable declaration. It creates (a) an entry in the \s{memory} cell, that maps the variable name \s{x} a free address in  \s{MMap} and (b) an entry in the \s{MMap} cell, that  maps the aforementioned address to an \s{undefined} value. 
+The following rewriting rule captures local variable declaration. It creates (a) an entry in the \s{memory} cell, that maps the variable name \s{x} a free address in  \s{MMap} and (b) an entry in the \s{MMap} cell, that  maps the aforementioned address to an \s{undefined} value, and (c) the line of code with the declaration is rewritten to empty($\dotCt{}$). 
+Shared variable declarations are  processed  similarly, except, that a copy of the variable is stored both at the global memory \s{gMemory} and at each agent's memory. 
 
 \input{variable}
-Recall, the \s{k} cell of an agent holds the code being executed.  Ellipses represents  (possibly empty) additional contents of the cell after the element being rewritten do not matter. The variable declaration rule first rewrites the line of code to empty($\dotCt{}$). At the same time, it creates an entry in the \s{memory} cell which maps \verb|X| to \s{L}, where \s{L} is the next available address in the \s{MMap}. Creating an entry in the map is the same as rewriting an empty element to the entry at the end of the map, hence the rewrite rule has the form $\reduce{\dotCt{}}{{M}}$, where $M$ is the entry being created.
 
-We omit the details of how we determine $L$, as it is not relevant. The rule also creates an entry in \s{MMap} with \s{L} corresponding to \s{undefined(T)} (undefined value of type \s{T}).  
 
-It should be mentioned that we assume unbounded memory for simplifying the semantics specification.  
 
-\subsection[h]{Time Advance Semantics}
+	
+\subsection[h]{Events and Time Advancement}
 \label{sect:exec}
 
-
-While designing the current semantics of this language we assume that we are able to maintain a global clock (the \s{time} cell). The clock advances when the environment transitions of each agent in the system are being made. Since global time is a part of the system configuration or state, we need to supply rewrite rules for advancing time. The time model $\tau$ is defined as a tuple $\tau = (\delta, n_0)$ where 
+The \s{time} cell models real-time  of the system and it advances when the environment transitions occur. The program transitions (events) take zero time. In general, \rolang programs can produce zeno behavior whereby arbitrarily many program transitions occur at the same real-time. The \K formalization for \rolang enables us to control the executable semantics with the following two parameters:
  \begin{itemize}
- \item $\delta$ : time between two environment transitions. 
- \item $n_0$ : number of times that the event block of each agent must execute between environment transitions.
- 
+ \item $\delta$: time elapsed over a single environment transitions 
+ \item $n_0$: maximum number of instantaneous program transitions per agent.
  \end{itemize}
+  The \s{counter} and \s{counterMap} cells in the system configuration ensure that each event block can execute at most ${n_0}$ times, before a environment transition occurs. 
  
-  We use the \s{counter} and \s{counterMap} cells in the configuration to ensure that the event block executes ${n_0}$ times. 
- 
- The parameter $n_0$ is defined as a guard against zeno behavior. Recall that the event block describes the program transitions of each agent, which takes zero logical time. Since event blocks can execute potentially infinite times between environment transitions, we enforce a limit of $n_0$.   
-We can now provide the rules of time progression in our semantics, given a time model $\tau = (\delta,n_0)$. 
+Consider an event block \s{pre(C); eff : S Es} where \s{S} is a list of statements, and \s{Es} is the list of events following the first event. If \s{C} holds then the first event rewrites to \s{S}, else it  rewrites to \s{Es}.  
+After an event occurs, the agent's \s{counter} is incremented and if the it is less than $n_0$ then the event block starts executing from the top again.
 
-\paragraph{Counter Advance Transition:}
-We first discuss how to increment the \s{counter} of an agent when it executes an event block. Given an event block \s{pre(C); eff : S Es} where \s{C} is a condition evaluating to true, \s{S} is the list of statements in the effect of that event, \s{Es} is the list of events following that; this event block rewrites to \s{S}. If \s{C} evaluates to false, this block rewrites to \s{Es}. We skip the details of the rewrite rules involved in this process. 
-\s{endEventBlock} is a marker that we introduce (using a rewrite rule) at the end of the event block. If while executing the semantics, an \s{endEventBlock} is encountered in the \s{k} cell, it should imply that an event has occurred, the \s{counter} should be incremented and  the event block should start executing from the top again.
- 
- Consider an agent with \s{id} $i$. If an \s{endEventBlock} is encountered in its \s{k} cell and the \s{count} cell value of the agent is $N$, the \s{k} cell is rewritten to empty. The \s{counter} cell is rewritten to $N+1$, and the corresponding value of its counter in the \s{counterMap} cell is also rewritten to $N+1$. This transition is enabled only as long as $N$ is less than $n_0$. This ensures that each agent executes its event block exactly $n_0$ times before the time increments. 
-\vspace{-1mm}
-\input{time1.tex}
-Note that when the \s{endEventBlock} is encountered, we rewrite the entire \s{k} cell to empty. How does the next iteration of the event block start then? We maintain a copy of the original application code in the state information, which is copied into the \s{k} cell at the beginning of every iteration of the event block. The implementation details are not relevant to the semantics. 
+\input{time1.tex}.
+%\input{time.tex}. 
 
-\paragraph{Time Advance Transition:}
-
-	Let \s{counterMap} cell, which maintains a map of ids to counter values of all agents contain a map $CM$. \s{findMax} and \s{findMin} are functions for computing the maximum and minimum in the range of a map respectively. If both the minimum and maximum values are equal, then all values in the range of the map are equal.  The \s{time advance} transition says that, given that the current global time is $T$, if all the counter values in $CM$ are equal to $n_0$, the global time is rewritten to $T+\delta$. The \s{transitionState} is set to \verb|dynamic| from \verb|discrete|. We do not show the rest of the configuration items because they do not appear in the condition or change with the time progression rule. 
-\input{time.tex}. 
-It is worth mentioning that while we designed the time progression such that the event block executes exactly $n_0$ number of times for each agent, we can easily change the design to accommodate different values for different agents. To do that, we modify the time model by adding another parameter $\rho$ to it. $\rho$ is a map from agent \s{ids} to integers. Instead of incrementing the counter by one every time an event occurs, agent with it $i$ increments its counter by $\rho[i]$. The number of times its event block executes is then $\floor{\frac{n_0}{\rho[i]}}$.
+	%Let \s{counterMap} cell, which maintains a map of ids to counter values of all agents contain a map $CM$. \s{findMax} and \s{findMin} are functions for computing the maximum and minimum in the range of a map respectively. If both the minimum and maximum values are equal, then all values in the range of the map are equal. 
+	The \s{time advance} transition advances global time from  $T$ to $T+\delta$. The \s{transitionState} is set to \verb|dynamic| from \verb|discrete|. 
+	%
+	\sayan{I pulled this para from the section on doReach avoid. Somehow we need to talk about updating the continuous variables.}
+	We then invoke the external function \s{doReachBB} to compute the new contents of the \s{position} cell of each agent at time $T_0 +\delta$, given that the position of the agent at time $T_0$ was $P$, the target \s{ItemPosition} is $T$, obstacles were stored in $O$, and the time increment was $\delta$. We omit the details of maintaining $T_0$, $O$ and $T$.
+%	
+%	We do not show the rest of the configuration items because they do not appear in the condition or change with the time progression rule. 
+%It is worth mentioning that while we designed the time progression such that the event block executes exactly $n_0$ number of times for each agent, we can easily change the design to accommodate different values for different agents. 
+%To do that, we modify the time model by adding another parameter $\rho$ to it. $\rho$ is a map from agent \s{ids} to integers. Instead of incrementing the counter by one every time an event occurs, agent with it $i$ increments its counter by $\rho[i]$. The number of times its event block executes is then $\floor{\frac{n_0}{\rho[i]}}$.
 
 
 \subsection[h]{Locking}

@@ -21,4 +21,15 @@
 }}
 }
 {}{}{}{}
+	\krule[global variable declaration]{
+		\kmiddle{agent}{
+			\kprefix{k}{
+				\reduce{{\variable[type]allwrite \variable[type]T \variable[ID]x;}}{{}{{\variable[type]T \variable[ID]x;}}} }
+			\kall{gmemory}{ \variable[Map]M \reduce{{\dotCt{}}}{{}{x \mapsto L}}}
+		}
+		\ksuffix{MMap}{
+			\reduce{\dotCt{}}{{}{L\mapsto undefined(T)}
+			}}
+		}
+		{x \terminal{not}\mbox{ }\terminal{in} \variable[Map]M.}{}{}{}
 \end{figure*}

@@ -20,4 +20,20 @@
   \mathrel{<_{\scriptstyle\it Int}}
   {{}\variable[Int]n_0}}
 }{}{}{}
+\krule[time advance transition]{
+	\kall{counterMap}{\variable[Map]CM}
+	\kall{time}{
+		\reduce{\variable[Int]{T}}{{}{\variable[Int]T \mathrel{+_{\scriptstyle\it Int}} \variable[Int]\delta}
+		}}
+		\kall{transitionState}{
+			\reduce{\terminal{discrete}}{{}{\terminal{dynamic}}
+			}}
+		}
+		{
+			{{\variable[Int]{n_0}}
+				\mathrel{==_{\scriptstyle\it Int}}
+				{{}\terminal{findMin}({\variable[Map]CM})} \terminal{and}{\variable[Int]{n_0}}
+				\mathrel{==_{\scriptstyle\it Int}}
+				{{}\terminal{findMax}({\variable[Map]CM})}}
+		}{}{}{}
 \end{figure*}
