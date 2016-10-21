@@ -4,11 +4,11 @@ This section describes the formal syntax of \rolang. We first provide the major 
 \begin{figure}[ht!]
 \footnotesize
 \begin{center}
-\noindent\begin{minipage}{.5\textwidth}
+\noindent\begin{minipage}{.45\textwidth}
 \begin{grammar}
-<Pgm> :: <VarDecls> <InitBlock> <EventBlock>
+<Pgm> :: <VarDecls><InitBlock><EventBlock>
 
-<VarDecls> :: <MwDecls> <SwDecls> <LocDecls>
+<VarDecls> :: <MwDecls><SwDecls><LocDecls>
 
 <MwDecls> :: "MW :" <Decls>
 
@@ -27,15 +27,15 @@ This section describes the formal syntax of \rolang. We first provide the major 
 <InitBlock> :: "Init :" <Stmts>
 \end{grammar}
 \end{minipage}\hfill
-\noindent\begin{minipage}{.5\textwidth}
+\noindent\begin{minipage}{.45\textwidth}
 \begin{grammar}
 <EventBlock> :: "EventBlock:" <Events>
 
-<Events> :: <Event> <Events> | <Event>
+<Events> :: <Event><Events> | <Event>
 
 <Event> :: <EventName> "(" <Expr> ")" "Pre" "(" <Expr>")" ";" "Eff :" <Stmts> 
 
-<Stmts> :: <Stmt> <Stmts> \\
+<Stmts> :: <Stmt><Stmts> \\
 		| <Empty>
 
 <Stmt> :: <Assignment> \\

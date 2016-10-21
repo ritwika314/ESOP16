@@ -1,4 +1,8 @@
-\section[h]{Formal Semantics}
+\section[h]{PCCL language specification}
+
+\input{syntax.tex}
+
+
 \label{sect:semantics}
 
 In this section we describe the formal semantics of key language elements. 
@@ -46,22 +50,19 @@ In the \texttt{Race} application of \refsect{Eg}, for example, the state updates
  %A {\em computation\/} is a program fragment, while the original program is flattened into a sequence of computations or programming tasks.
  %
 A {\em rewrite rule\/} describes a one-step transition between configurations. 
- %Rules are modular; they mention only relevant cells needed in each rule.
-  \sayan{Give a simple rule as a figure and refer to it to explain the following notational conventions.}
- \sayan{what is a reduction? application of a rewrite rule?}
- (i.e. a transition relation). For example, \reffig{krule} is a variable lookup rule in \K. 
+  For example, \reffig{krule} is a lookup rule in \K. 
 
 \begin{figure}[h]
 \label{fig:krule}
-\krule[variable lookup]{
+\krule[lookup]{
  \kprefix{k}{\reduce{\variable{X}}{\variable{V}}} \mathrel{}
-  \kmiddle{memory}{\variable{X} \mapsto \variable{L}} \mathrel{}
-  \kmiddle{Mmap}{\variable{L} \mapsto \variable{V}}}{}{}{}{}
+  \kmiddle{memory}{\variable{X} \mapsto \variable{V}} \mathrel{}
+  }{}{}{}{}
 \end{figure}
 The cells are represented within angular brackets. The horizontal line represents a rewrite, with the previous term above it, and the result of the rewrite below it. A cell without a rewrite requires being read, but not changed by the rule.
-The lookup rule mentions three cells: \s{k}, \s{memory} and \s{MMap}.
-The \s{k} cell contains a list of computations to be executed, and the \s{memory} cell is a map of variables to their addresses and the \s{MMap} is a map from locations to actual values.
-This rule is applied when the current computation (top of the \s{k} cell) is a variable look-up expression \w{X}, \w{X} is matched in the environment with an address \w{L}, and the address \w{L} is matched in the \s{MMap} with a value \w{V}.
+The lookup rule mentions two cells: \s{k}, and \s{memory}.
+
+This rule is applied when the current computation (top of the \s{k} cell) is a look-up expression \w{X}, \w{X} is matched in the \s{memory} with a value \w{V}.
 This rule rewrites the variable look-up \w{X} to the value \w{V}.
 The ``...'' is a structural frame, that is, it matches the portions of a cell that are neither read nor written by the rule.
  
@@ -122,11 +123,13 @@ It should be mentioned that we assume unbounded memory for simplifying the seman
 While designing the current semantics of this language we assume that we are able to maintain a global clock (the \s{time} cell). The clock advances when the environment transitions of each agent in the system are being made. Since global time is a part of the system configuration or state, we need to supply rewrite rules for advancing time. The time model $\tau$ is defined as a tuple $\tau = (\delta, n_0)$ where 
  \begin{itemize}
  \item $\delta$ : time between two environment transitions. 
- \item $n_0$ : number of times that the event block of each agent must execute between environment transitions. We use the \s{counter} and \s{counterMap} cells in the configuration for bookkeeping this. 
- 
- The parameter $n_0$ is defined as a guard against zeno behavior. Recall that the event block describes the program transitions of each agent, which takes zero logical time. Since event blocks can execute potentially infinite times between environment transitions, we enforce a limit of $n_0$.   
+ \item $n_0$ : number of times that the event block of each agent must execute between environment transitions.
  
  \end{itemize}
+ 
+  We use the \s{counter} and \s{counterMap} cells in the configuration to ensure that the event block executes ${n_0}$ times. 
+ 
+ The parameter $n_0$ is defined as a guard against zeno behavior. Recall that the event block describes the program transitions of each agent, which takes zero logical time. Since event blocks can execute potentially infinite times between environment transitions, we enforce a limit of $n_0$.   
 We can now provide the rules of time progression in our semantics, given a time model $\tau = (\delta,n_0)$. 
 
 \paragraph{Counter Advance Transition:}

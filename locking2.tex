@@ -2,10 +2,10 @@
 \label{fig:lock}
 \krule[atomic wait transition]{
 \kmiddle{agent}{
-\begin{array}{@{}c@{}}
+\begin{array}{@{}c@{}c@{}}
 \kall{id}{\variable[Int]{i_1}}
 \kall{lockState}{
- {\constant[\#Type]{request}}
+ {\terminal{request}}
 }
 \kall{counter}{
 \reduce{\variable[Int]N}{\variable[int]N{+_{\scriptstyle\it Int}} \constant[Int]1}
