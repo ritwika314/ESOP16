@@ -21,11 +21,36 @@ In the \texttt{Race} application of \refsect{Eg}, for example, the state updates
 %
 %\sayan{resuming here}
 
+ \subsection{Overview of \K}
+ We give the semantics of \rolang using the \K framework~\cite{rosu-serbanuta-2013-k}.
+ \K is a rewriting-based executable framework for defining language semantics.
+ Given a syntax and a semantics of a language, \K generates a parser, an interpreter, as well as analysis tools such as model checkers and deductive program verifiers ``for free''.
+% \K also provides several formal analysis tools, which will enable us to perform formal reasoning about the language we have defined using this framework. \sayan{too vague, what are these tools? do we use them in this paper? how?}
+  %This helps both in terms of applicability of the semantics and in terms of engineering the semantics itself; 
+  For instance, the state-space exploration capability helps debug \rolang programs.
+  For modelling interactions between agents, an appealing aspect of \K is its inherent support for non-determinism.
+  Rewriting logic~\cite{meseguer2007rewriting}, makes \K suitable for reasoning about distributed systems that are  non-deterministic. 
+
+ 
+ In \K, a language syntax is defined using conventional Backus-Naur Form (BNF).
+ The semantics is given as a transition system, specifically, as a set of reduction rules over  configurations.
+ A {\em configuration\/} is an  representation of the program code and state.
+ For \rolang, a configuration represents the code and the program state for all the agent, as well as the state of the physical environment (see Figure~\ref{fig:arch}). 
+ Components or members of a configuration are called {\em cells.}
+ A special cell, named \s{k}, contains a list of computation to be executed.
+ %A {\em computation\/} is a program fragment, while the original program is flattened into a sequence of computations or programming tasks.
+ %
+A {\em rewrite rule\/} describes a one-step transition between configurations. 
+ %Rules are modular; they mention only relevant cells needed in each rule.
+  \sayan{Give a simple rule as a figure and refer to it to explain the following notational conventions.}
+ The cells are represented with angle brackets notation.
+ The horizontal line represents a reduction
+ \sayan{what is a reduction? application of a rewrite rule?}
+ (i.e. a transition relation).
+ A cell with no horizontal line means that it is read but not changed by the rule.
  
  
-
-
-In \refsect{syntax}, we described the structure of applications written in this language; each application is written in terms of events. We say that an event has occurred if its precondition was evaluated as true, and the corresponding effect was executed. Once an event has occurred, the program control goes back to the top of the event block. The event block (\s{eventBlock}) is said to be executed when any event in the event block occurs once. Given an agent running an application, its event block can be executed repeatedly while the application continues to run. Communication between agents takes place through shared memory updates. Shared memory updates require mutual exclusion, which is implemented by a locking mechanism. We describe the \verb|atomic| construct, which is used for mutual exclusion, in \refsect{locking}.
+ 
 
 
 \subsection[h]{Configuration}
