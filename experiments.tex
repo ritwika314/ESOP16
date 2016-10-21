@@ -98,7 +98,7 @@ InCs():
  \end{figure}
  
  To ensure that this protocol works, the local \s{inCs} variable of at most one agent can be true at \s{time} $T$. The assignment stage takes at least 2 increments of time, as we increment the counter every time an agent makes a lock request, and in this example, the time also increments as soon as the counter is incremented. The following execution trace shows that for \s{d} = 2, we can violate this property. For bounded executions, we were unable to find traces which violated this property when \s{d} was set to a value greater than 2 , which is expected. 
- \begin{figure}[H]
+
 \begin{verbatim}
  <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
  c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
@@ -119,11 +119,11 @@ InCs():
  </MMap>
  <time> 0 </time>
 \end{verbatim}
-\end{figure}
+
+
 At time = 0; both the agents have executed the \s{Start} event, indicated by the fact that the \s{start} variables of both agents, corresponding to addresses \verb|8| and \verb|22| respectively, map to \verb|false| in the \s{MMap}. The \s{waitTime} for agent with agent 0 is stored at address \verb|7|, and is seen from the \s{MMap} to be 6. The \s{waitTime} for agent 1 is seen to be 3.   
 
 At time = 4, agent 1 is seen to be executing \s{Assign} event, as evidenced by the fact that variable \s{assign} for agent 1 stored at address \verb|23| is true. Agent 0 is still waiting to start its \s{Assign} event, since its \s{c1} is still 4 and its \s{waitTime} is 6.  
- \begin{figure}[H]
 \begin{verbatim}
  <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
  c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
@@ -144,9 +144,11 @@ At time = 4, agent 1 is seen to be executing \s{Assign} event, as evidenced by t
  </MMap>
  <time> 4 </time>
 \end{verbatim}
-\end{figure}
+
+
 At time = 11, we see that the \s{inCs} values of both agents are true, which violates the correctness of this protocol. 
- \begin{figure}[H]
+
+ 
 \begin{verbatim}
  <agent> ... <memory> start |-> 8 wait |-> 11 inCs |-> 12 cstime |-> 15 
  c1 |-> 13 c3 |-> 16 reqid |-> 3 id |-> 6 k |-> 4 waitTime |-> 7 assign |-> 9
@@ -167,7 +169,7 @@ At time = 11, we see that the \s{inCs} values of both agents are true, which vio
  </MMap>
  <time> 11 </time>
 \end{verbatim}
-\end{figure}
+
 During this execution, as agent 0 was assigning the \s{reqid} to its own \s{id}, agent 1 had entered the \s{delay} state. 
 When the agent 1 checked whether it can enter the critical section, agent 0 hadn't assigned \s{reqid} to its own it. Agent 1 set \s{inCs} to true, which signifies that it is in the critical section, and still is in it when agent 0 enters after satisfying all requirements. 
 
@@ -179,23 +181,64 @@ We revisit the race example from earlier, where a group of robots try to race to
 \label{fig:Race}
 \noindent\begin{minipage}{.5\textwidth}
 
-\begin{lstlisting}[mathescape = true]
-Agent::Race      
-			$\vdots$ 
+\begin{lstlisting}
+Agent::Race
+
+allwrite:
+	List<ItemPosition> dests 
+    	= getInput();
+allread:
+
+loc:
+  ObstacleList obs = getObs();
+  boolean Pick = true; 
+  ItemPosition currentDest;
+Init:
+
+PickDest():
+  pre(Pick);
+  eff:
+    if (isEmpty(dests)):
+    exit();   
+ \end{lstlisting}
+ \end{minipage}\hfill
+\noindent\begin{minipage}{.5\textwidth}
+
+\begin{lstlisting}
+    else:
+      currentDest = head(dests);
+      doReach(currentDest,obs);
+      Pick = false;
+      
 Remove():
   pre(!Pick);
   eff:
     if(doReach_done):
-    	if(contains(
-    	    dests,currentDest)):
-            atomic:
-        		remove(dests,currentDest);
-    	Pick = true;
+      atomic:
+        if(contains(
+        dests,currentDest)):
+        remove(dests,currentDest);
+   	  Pick = true;
  \end{lstlisting}
  \end{minipage}\hfill
- \caption{Race Application: non atomic membership checking}
+ \caption{Race Application}
  \end{figure}
+ 
 
 
+\reffig{list1} shows an execution in which the agent cannot process the statement which asks to remove an \s{ItemPosition} from the \s{dests}, as between the time that it checked for membership and tried to update the list atomically, another agent already managed to remove the said \s{ItemPosition}.
 
-\reffig{list1} shows an execution in which the agent cannot process the statement which asks to remove an \s{ItemPosition} from the \s{dests}, as between the time that it checked for membership and tried to update the list atomically, another agent already managed to remove the said \s{ItemPosition}. \reffig{list2} shows the final configuration of an execution with a different blackbox, which managed not to encounter this error. 
+\subsection{StarL robotic framework}
+
+We are developing \rolang to interface with the Stabilizing Robotics Language (\StarL). 
+\StarL is primarily in Java, and it provides language constructs for coordination and control
+across robots.Two key features of \StarL are a distributed shared memory (DSM) primitive
+for coordination and a reach-avoid primitive for control. DSM allows a
+program to declare program variables that are shared across multiple robots
+. This enables programs running on different
+robots to communicate by writing-to and reading from the shared variable.
+
+All the program threads implementing the application, the message channels,
+as well as the physical environment of the application (robot chassis, obstacles)
+are modeled as hybrid automata, and the overall system is described
+by a giant composition of these automata. 
