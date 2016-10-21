@@ -37,13 +37,17 @@ In the \texttt{Race} application of \refsect{Eg}, for example, the state updates
  A {\em configuration\/} is an  representation of the program code and state.
  For \rolang, a configuration represents the code and the program state for all the agent, as well as the state of the physical environment (see Figure~\ref{fig:arch}). 
  Components or members of a configuration are called {\em cells.}
+ The notation $\kall{cellname}{celltype}$  
+ represents a cell called $\mathit{cellname}$
+ with a value of type ${\sf celltype}$.
+% 
  A special cell, named \s{k}, contains a list of computation to be executed.
+ Cells may be nested, that is, contain other cells. 
  %A {\em computation\/} is a program fragment, while the original program is flattened into a sequence of computations or programming tasks.
  %
 A {\em rewrite rule\/} describes a one-step transition between configurations. 
  %Rules are modular; they mention only relevant cells needed in each rule.
   \sayan{Give a simple rule as a figure and refer to it to explain the following notational conventions.}
- The cells are represented with angle brackets notation.
  The horizontal line represents a reduction
  \sayan{what is a reduction? application of a rewrite rule?}
  (i.e. a transition relation).
@@ -53,30 +57,43 @@ A {\em rewrite rule\/} describes a one-step transition between configurations.
  
 
 
-\subsection[h]{Configuration}
-The configuration, or state, holds program variables, objects, and the execution context. We omit implementation minutiae, and only show relevant features. In the configuration, an agent is represented by an \s{agent} cell. Recall that a cell is a configuration unit, which is denoted by $\langle \mbox{cell-type} \rangle_{\mbox{cell-name}}$. For instance, a cell maintaining the \s{position} of an agent, which has type \verb|ItemPosition| will be represented as $\langle {\verb|ItemPosition|} \rangle_{\s{position}}$. Cells can also be composite cells, or containers of other cells. They will just be denoted by $\langle\mbox{cell-contents}\rangle_{\mbox{cell-name}}$.  
-
-Each agent is represented by a composite cell, because the code is executed at agent level, and requires agent-specific information. An \s{agent} is identified by a unique identifier \s{id} (which is an integer). Its configuration contains the following cells. 
+\subsection{Agent Cells and System Configuration}
+%The configuration holds program variables, objects, environment variable, and the execution context. 
+%We omit implementation minutiae, and only show relevant features. 
+%
+Each agent has an \s{agent} cell which stores the program variables of the agent, its execution context, as well as environment variables that are relevant for the agent such as the agent's position.  The \s{agent} cell consists of the following cells.
+%For instance, a cell maintaining the \s{position} of an agent, which has type \verb|ItemPosition| will be represented as $\langle {\verb|ItemPosition|} \rangle_{\s{position}}$. Cells can also be composite cells, or containers of other cells. 
+%They will just be denoted by $\langle\mbox{cell-contents}\rangle_{\mbox{cell-name}}$.  
+%
+%Each agent is represented by a composite cell, because the code is executed at agent level, and requires agent-specific information. An \s{agent} is identified by a unique identifier \s{id} (which is an integer). Its configuration contains the following cells. 
 \begin{itemize}
- \item  \s{k} : Contains an agent's own application code. Each line in this cell is rewritten (possibly to empty) as the semantics is executed.
- \item \s{id} : Contains the agent's unique integer identifier. 
- \item \s{memory} : Contains a map from variables to addresses. 
- \item  \s{position} : The current position of the agent. Note that we only include the position cell in the current semantics because the applications we intend to write are in the domain of robotics. We can create cells to time-varying attributes of the agents as required.  
- \item  \s{counter} : The \s{counter} cell of each agent in the configuration maintains the number of times the event block of that agent has executed.
- \item \s{lockState} : Denotes whether or not the agent holds the requested lock. We discuss locking in \refsect{locking}. 
+ \item  \s{k}: agent's own application code
+ %Each line in this cell is rewritten (possibly to empty) as the semantics is executed.
+ \item \s{id}: agent's unique integer identifier 
+ \item \s{memory}: a map from agent's program variables to addresses
+ \item  \s{position}: agent's current position in space in common coordinates 
+ \item  \s{counter}: counts the number of times the agent's event block has executed
+ \item \s{lockState}: Denotes whether or not the agent holds the requested lock.
+ \sayan{confused about the type idle}
 \end{itemize}
 \input{configuration2.tex}
- Each agent's \s{memory} cell is a map from \emph{all} variables(of type \s{Id}, short for string identifier), to addresses(of type \s{Int}). Both global and local variables are included in this \s{memory}. This amounts to maintaining local copies of global variables, which are consistent across agents.  
- 
-The top level cell is called the \s{system cell}, which represents the distributed agent system. This cell contains the following cells:
+%
+The \s{memory} cell maps  \emph{all}---local and shared---variable names to addresses (of type \s{Int}). That is,  the agent's memory actually has copies of the shared variables.
+The \s{position} cell is specific to agents programs that rely on positional sensors. Other cells for different sensors can be included as well. 
+We will discuss how shared variables reads and writes update the local copies and the related consistency models in~\refsect{shared-consist}. 
+We will discuss locking in~\refsect{locking}. 
+
+  
+The top-level system configuration cell is called  \s{system} (Figure~\ref{fig:highlevelconfig}; it consists of the  following main cells:
 \begin{itemize}
-\item \s{agents} : This is a container cell for \s{agent} cells. It can contain as many such cells as the number of agents running the application, denoted by multiplicity "*". 
-\item \s{gMemory} : This is the global memory, contains a map from all shared variables to addresses in the memory . 
-\item \s{MMap} : Each variable of the application has an address in memory; we will presently discuss the scope of said memory. \s{MMap} stands for memory map, which is a map from addresses in the memory to actual values corresponding to the variables. 
-\item  \s{time} : This is cell for maintaining time elapsed. 
-\item \s{counterMap} : This cell maintains the map of agent \s{ids} to their \emph{counter} (\refsect{exec}) values. We explain what that refers to, in the next paragraph. 
-\item  \s{lockQueue}: This cell is used to maintain the order in which the lock requests have been made.
-\item \s{transitionState} : This cell stores whether the system is currently demonstrating dynamic behavior or not.  
+\item \s{agents}: contain $N$ \s{agent} cells. \sayan{why *?lets fix $N$ as the number of agents.}
+\item \s{gMemory}: maps all shared variables to addresses in the memory 
+\item \s{MMap}:a map from memory addresses  to variable values  
+\item  \s{time}: global time elapsed 
+\item \s{counterMap}: map of agent \s{ids} to their \emph{counter} (\refsect{exec}) values
+%We explain what that refers to, in the next paragraph. 
+\item  \s{lockQueue}: maintains the order of lock requests
+\item \s{transitionState}: indicates whether or not \sayan{environment transitions} are being executed.  
 \end{itemize}
 \input{configuration1.tex}
 \subsection[h]{Local Variable Declaration}
@@ -114,7 +131,7 @@ Suppose that the \s{counterMap} cell, which maintains a map of ids to counter va
 It is worth mentioning that while we designed the time progression such that the event block executes exactly $n_0$ number of times for each agent, we can easily change the design to accommodate different values for different agents. To do that, we modify the time model by adding another parameter $\rho$ to it. $\rho$ is a map from agent \s{ids} to integers. Instead of incrementing the counter by one every time an event occurs, agent with it $i$ increments its counter by $\rho[i]$. The number of times its event block executes is then $\floor{\frac{n_0}{\rho[i]}}$.
 
 
-\section[h]{Locking}
+\subsection[h]{Locking}
 \label{sect:locking}
 We provide global locks to implement mutual exclusion for the atomic construct. 
 	These locks have two major properties:
