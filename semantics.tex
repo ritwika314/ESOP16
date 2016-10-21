@@ -2,7 +2,7 @@
 \label{sect:semantics}
 
 In this section we describe the formal semantics of key language elements. 
-The system consists of \textbf{N} agents $A_1$, ..., $A_N$. The state of the overall system advances by two types of transitions: 
+The system consists of $N$ agents $A_1,\ldots,A_N$. The state of the overall system advances by two types of transitions: 
 (a) {\em program transitions\/} correspond to agent program events updating agent variables and possibly setting waypoints for the agent's controllers. Program transitions take zero logical time.
 (b) {\em environment transitions\/} 
 correspond to the physical environment of the agent evolving over an interval of time. During this period, the agent platforms may be moved by their controllers, messages implementing the distributed shared memory abstraction are propagated. 
@@ -12,11 +12,14 @@ Thus, a given \rolang program may be executed with different  external functions
 % resume here.
 %In doing so we use a parametrized formal semantics, where the parameters govern the intervals at which the system is observed(\refsect{exec}) and how the system evolves with respect to time(\refsect{dynamics}). Essentially, we specify the semantics of the language, provided there is a procedure to compute the physical control component of a system. 
 %
-For instance, in the race application described in \refsect{Eg}, we parameterize the language semantics with the procedure for computing the positions of the robots at a given time. The event block is like the discrete step of a hybrid automaton, and the dynamic behavior is the continuous trajectory\cite{hioa}. The discrete part of the system corresponds to the programs, which interact with the physical environment using the \s{doReach} abstraction. The programs communicate with each other using shared variables.
 
-We explain this further in the following sections, starting with a description of the system state. We then describe the major features of the language semantics, including the time model and the dynamics model, which parametrize the semantics. 
+In the \texttt{Race} application of \refsect{Eg}, for example, the state updates brought about by the \texttt{PickDest} and \texttt{Remove} events are program transitions and take zero logical time. In between these transitions, time may elapse and the corresponding change in the position of the agent is determined by its controller, its physical environment, etc., which are external to the program. 
 
-\sayan{resuming here}
+%we parameterize the language semantics with the procedure for computing the positions of the robots at a given time. The event block is like the discrete step of a hybrid automaton, and the dynamic behavior is the continuous trajectory\cite{hioa}. The discrete part of the system corresponds to the programs, which interact with the physical environment using the \s{doReach} abstraction. The programs communicate with each other using shared variables.
+%
+%We explain this further in the following sections, starting with a description of the system state. We then describe the major features of the language semantics, including the time model and the dynamics model, which parametrize the semantics. 
+%
+%\sayan{resuming here}
 
  
  
