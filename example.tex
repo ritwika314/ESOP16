@@ -2,6 +2,8 @@
 \label{sect:Eg}
 We present a simple illustrative example to demonstrate some of the features of the language, and to aid discussion in future sections. We want to design an application where (a group of) robots try to visit a predetermined sequence of waypoints, with predetermined obstacles. We aim to ensure that a robot choosing the next destination will not pick a waypoint that has already been visited by some robot. The code for this application is provided in \reffig{Race}.
 
+\lstset{basicstyle=\scriptsize\ttfamily,breaklines=false}
+
 \begin{figure}[ht!]
 \label{fig:Race}
 \noindent\begin{minipage}{.5\textwidth}
@@ -30,7 +32,7 @@ PickDest():
 \noindent\begin{minipage}{.5\textwidth}
 
 \begin{lstlisting}
-    else :
+    else:
       currentDest = head(dests);
       doReach(currentDest,obs);
       Pick = false;
