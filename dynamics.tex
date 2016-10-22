@@ -1,14 +1,31 @@
 \subsection{Dynamics}
 \label{sect:dynamics}
-We first present the semantic rules involving the \s{doReach} abstraction. 
+We first present the semantic rules involving the \s{doReach} abstraction. The physical environment uses the \s{doReach} component to communicate with the application, which in turn uses flags \s{doReach\_done} and \s{doReach\_fail} to store the continuous control variables used by the application. In this case, \s{position} is such a variable. Recall that \s{doReach} takes two arguments, the \emph{target}, and the \emph{obstacle}. The exact format of the obstacle is irrelevant to the semantics, as it is implementaion specific to the \s{doReach} external function. This function is invoked whenever time advances. The target and the obstacles are set to current position and empty initially, unless the application specifies otherwise. 
 
-\paragraph{doReach transition}
-The \s{doReach} component interfaces with the application using flags \s{doReach\_done} and \s{doReach\_fail}. When \s{doReach} is invoked, the external function containing the implementation of \s{doReach} is called. Recall that \s{doReach} takes two arguments, the \emph{target}, and the \emph{obstacle}. The exact format of the obstacle is irrelevant to the semantics, as it is used by implementation specific objects in the \s{doReach} external function. \s{doReach} is technically invoked at each time increment. The target and the obstacles are set to current position and empty initially, unless the application specifies otherwise. Again, we omit the details of how we store these in the configuration. We now provide the rule to process the \s{doReach} statement when it appears in the application. 
+\paragraph{doReach invoke transition} The \s{transitionState} cell of the system is set to \s{continuous} when all the \s{counter} values of all agents reach $n_0$. Suppose that the last observed position was $P$, and the time it was observed at was $T_0$, the target is $T$, and the obstacles are stored in $O$. Time increments by $\delta$ during an environment transition. These variables are also updated at the end of every round, but we omit those details. 
+%
 
-
-\paragraph{doReach update transition: }When a \s{doReach} statement is encountered in the program, the statement itself is rewritten to empty. The $\curvearrowright$ is used to break down the program, which is seen as a single task, into a sequence of tasks. Therefore, it means after rewriting the \s{doReach} to empty, the \s{doReach} flags should be reset(\s{doReach\_done,doReach\_fail} are both set to false), which should in turn be followed by setting the target of this agent, and the list of obstacles. The \s{setTargetObs} function sets the values of target, obstacle , and current time. 
 \begin{figure}
-\label{fig:lock1}
+\label{fig:doreach2}
+\krule[doreach invoke transition]{
+\kprefix{agent}{
+\begin{array}{@{}c@{}}
+\kall{id}{\variable[Int]{i}}
+\kall{counter}{\reduce{N}{0}}
+\kall{position}{\reduce{\variable[ItemPosition]P}{P_{1}}}
+\end{array}
+}\mathrel{}
+\kmiddle{counterMap}{\reduce{i\mapsto N}{i \mapsto 0}}
+\kall{transitionState}{continuous}}
+{N \mathrel{==_{\scriptstyle\it Int}} n_0 \terminal{and} P_{1} = \terminal{doReachBB}(P,T,O,T_0,\delta,i)}{}{}{}
+\end{figure}
+
+
+
+The rule to process a \s{doReach} statement  in the application is as follows. 
+\paragraph{doReach update transition: }When a \s{doReach} statement is encountered in the program, the statement itself is rewritten to empty. The $\curvearrowright$ is used to break down the program, which is seen as a single task, into a sequence of tasks. Therefore, it means after rewriting the \s{doReach} to empty, the \s{doReach} flags should be reset(\s{doReach\_done,doReach\_fail} are both set to false), which should in turn be followed by setting the target of this agent, and the list of obstacles. The \s{setTargetObs} function sets the values of target, obstacle, and current time. The external function \s{doReachBB} is called on these values at the end of this round of program transitions.  
+\begin{figure}
+\label{fig:doreach1}
 \krule[doreach update transition]{
 \kprefix{agent}{
 \begin{array}{@{}c@{}}
@@ -21,24 +38,3 @@ The \s{doReach} component interfaces with the application using flags \s{doReach
 \kall{time}{T_0}
 }{}{}{}{}
 \end{figure}
-\vspace{-2mm}
-\paragraph{doReach invoke transition} Recall that the \s{transitionState} cell of the system is set to \s{dynamic} when all the \s{counter} values of all agents reach $n_0$. Suppose the current \s{time} is $T_0$ The time advances by $\delta$. 
-%
-
-
-\begin{figure}
-\label{fig:lock1}
-\krule[doreach invoke transition]{
-\kprefix{agent}{
-\begin{array}{@{}c@{}}
-\kall{id}{\variable[Int]{i}}
-\kall{counter}{\reduce{N}{0}}
-\kall{position}{\reduce{\variable[ItemPosition]P}{P_{1}}}
-\end{array}
-}\mathrel{}
-\kmiddle{counterMap}{\reduce{i\mapsto N}{i \mapsto 0}}
-\kall{transitionState}{dynamic}}
-{N \mathrel{==_{\scriptstyle\it Int}} n_0 \terminal{and} P_{1} = \terminal{doReachBB}(P,T,O,T_0,\delta,i)}{}{}{}
-\end{figure}
-
-
