@@ -1,0 +1,66 @@
+agent::Sats
+
+
+allwrite:
+	int last = -1 ; 
+
+
+allread:
+	int next = -1;
+	int l = 0; 
+
+local:
+	string Stage = "Fly";
+  
+  
+init:
+	
+
+events:
+
+	Fly():
+		pre(l<uid> == 0);
+		eff:
+			atomic:
+				next<uid> = last;
+				last = uid;
+				l<uid> = 1;
+		
+	Holding():
+		pre(l<uid> == 1 and (next<uid> == -1 or l<(next<uid>)> == 2) and () );
+
+		eff:
+		    l<uid> = 2; 
+		    	
+	Base():
+		pre(l<uid> == 2);
+		eff:
+		    l<i> = 1;	
+		    if (last != uid):
+			next<uid> = last; 
+		    else:
+                    endif
+                    for i in range(0,nagents):
+			if (next<i> != uid) :
+			    next<i> = -1;
+			else:
+			endif
+			
+	Base2():
+		pre(l<uid> == 2 and next<uid> == -1);
+		eff :
+		    l<uid> = 3; 
+	            if (last == i):
+			last = -1;
+                    else:
+                    endif
+                    for i in range(0,nagents):
+	                if (next<i> == uid)"
+			    next<i> = -1;
+		        else:
+                        endif
+
+	Runway():
+		pre(l<uid> == 3):
+		eff:
+			
